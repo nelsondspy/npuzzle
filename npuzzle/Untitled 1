@@ -1,0 +1,20 @@
+-Se debe minimizar el uso de memoria utilizando metodos estaticos.
+
+-se requiere una funcion que llene con valores aleatorios la matriz.
+cargaDesorden()
+
+-se requiere una funcion que devuelva una lista de movientos posibles
+posiblesMov()
+
+-se requiere la funcion mover(direccion) 
+o bien o moverArriba(), moverAbajo. moverIzquierda
+
+-se requiere una funcion que dado un estado genere nuevos estados sucesores.
+pero que evite repetir estados 
+getSucesores(estado)
+
+se requiere una clase Estado que encapsule al objeto Tablero.
+
+una funcion de busqueda que este abstraida del tipo de elementos internos que tiene
+
+un nodoEstado puede ser una interface
