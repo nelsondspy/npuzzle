@@ -1,24 +1,25 @@
 package npuzzle;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
 public class BusquedaArbol {
 	
 	/*lista de estados generados para evitar volver 
 	 * a generar estados repetidos */
 	 
 	
-	public void busquedaAncho(){
+	public void busquedaAncho(Tablero tablero){
 		
 		HashMap <String, String> mapaEstadosgen; 
 		
 		mapaEstadosgen = new HashMap <String, String>();
 		
-		Tablero tablero = new Tablero(3, true);
+		//Tablero tablero = new Tablero(3, true);
 		
 		Nodo nodoinicial = new Nodo(tablero, null, null) ;
 		
-		Nodo nodo = new Nodo();
-		
+		Nodo nodo = nodoinicial;
 		
 		ArrayList<Nodo>frontera = new ArrayList<Nodo>();
 		
@@ -29,23 +30,19 @@ public class BusquedaArbol {
 		int cantRepetidos = 0 ;
 		
 		while(true){
+			
+			
 			if ( frontera.isEmpty() ){
 				
 				System.out.println("que mala onda!");
 				System.out.println("cantRepetidos:"+ cantRepetidos);
 				System.out.println("mapaEstadosgen:"+ mapaEstadosgen.size());
-				
-				int estadoob[][] ={{0,1,2},{3,4,5},{6,7,8}};
-				
-				int estadoob2[][] ={{1,2,3},{4,5,6},{7,8,0}};
-				
-				System.out.println("t1:" + mapaEstadosgen.get(MatrizUtils.strElementos(estadoob)));
-				System.out.println("t2:" + mapaEstadosgen.get(MatrizUtils.strElementos(estadoob2)));
+				System.out.println("frontera.size():"+ frontera.size());
 				System.out.println(nodoinicial.estado.toString());
-				return ;
+				
+				return  ;
 			}
-			
-			
+				
 			//cola fifo , obtiene y remueve el primero
 			nodo = frontera.remove(0);
 			
@@ -53,6 +50,10 @@ public class BusquedaArbol {
 				System.out.println("solucionado papaa!");
 				System.out.println(nodo.estado.toString());
 				System.out.println("profundidad:" + nodo.profundidad);
+				/*for (Map.Entry<String, String> entry : mapaEstadosgen.entrySet()) {
+					System.out.println(entry.getKey()) ; 
+				}*/
+				
 				return ;
 			}
 			
@@ -62,20 +63,19 @@ public class BusquedaArbol {
 	    	
 	    	String hashmatriz = nodo.estado.toStrHash();
 	    	
-			if (mapaEstadosgen.containsKey(hashmatriz)){
-				cantRepetidos ++;
-				continue;
-	    	}
+			if ( ! mapaEstadosgen.containsKey(hashmatriz)){
+				    
+				//inserta en la lista de hash de estados
+			    mapaEstadosgen.put(hashmatriz,hashmatriz);
 			
-		    //inserta en la lista de hash de estados
-		    mapaEstadosgen.put(hashmatriz,hashmatriz);
+			    //expande y los nuevos nodos los inserta directamente en la frontera
+				Nodo.expandir(nodo, frontera);
 			
-			//expande y los nuevos nodos los inserta directamente en la frontera
-			Nodo.expandir(nodo, frontera);
+	    	}		
 			
 			//estados generados 
 			cantgenerado = frontera.size() + 1;
-			System.out.println("Total Estados generados:" + cantgenerado  );
+			//System.out.println("Total Estados generados:" + cantgenerado  );
 			
 			
 		}
@@ -84,7 +84,18 @@ public class BusquedaArbol {
 	
 	public static void main(String[] args) {
 		BusquedaArbol busquedanueva = new BusquedaArbol();
-		busquedanueva.busquedaAncho();
+		
+		int m1 [][]= {{7,6,1},{4,0,5},{3,2,8}} ;
+		
+		int m2 [][] = {
+		{5,	6	,2},
+		{8	,0	,7},
+		{3	,1	,4 }
+		};
+
+		Tablero tablero = new Tablero( m1 );
+		
+		busquedanueva.busquedaAncho( tablero );
 		
 	}
 }
