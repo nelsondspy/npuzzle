@@ -1,3 +1,8 @@
+/* Tablero
+ * 21/09/2014
+ * 
+ * 
+ * */
 package npuzzle;
 
 import java.util.ArrayList; 
@@ -26,6 +31,20 @@ public class Tablero {
         int[] pos = MatrizUtils.buscarDato(matriz, 0);
         XcasillaVacia = pos [1];
         YcasillaVacia = pos [0];
+    }
+    
+    
+    public Tablero(int[][] matriz){
+    	
+    	/*Instancia un tablero, con una matriz */
+    	
+    	this.matriz = matriz;
+    	
+    	//Obtiene la posicion de la casilla vacia (valor 0)
+    	int[] pos = MatrizUtils.buscarDato(matriz, 0);
+    	XcasillaVacia = pos [1];
+        YcasillaVacia = pos [0];
+        tamanho = matriz.length ;
     }
     
     
