@@ -44,7 +44,7 @@ public class Tablero {
     	int[] pos = MatrizUtils.buscarDato(matriz, 0);
     	XcasillaVacia = pos [1];
         YcasillaVacia = pos [0];
-        tamanho = matriz.length ;
+        tamanho = matriz.length  ;
     }
     
     

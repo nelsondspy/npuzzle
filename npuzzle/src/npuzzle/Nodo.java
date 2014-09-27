@@ -2,7 +2,6 @@ package npuzzle;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-
 import npuzzle.Problema.Accion;
 
 public class Nodo {
@@ -10,6 +9,9 @@ public class Nodo {
     Tablero estado;
     Accion accion;
     int profundidad = 0;
+    
+    int costo = 0 ;
+    
     
     public Nodo(Tablero estado, Nodo padre, Accion accion){
     	this.estado = estado;
@@ -19,10 +21,28 @@ public class Nodo {
     	if (padre==null){ 
     		this.profundidad=0;
     	}else{
-    		this.profundidad = padre.profundidad + 1 
-    	;} 
+    		this.profundidad = padre.profundidad + 1 ;
+    	} 
     	    
     }
+    
+    
+    /* */
+    public Nodo(Nodo padre, Tablero estado, Accion accion, int costoHeur) {
+        this.padre = padre;
+        this.estado = estado;
+        this.accion = accion;
+        
+        
+        if (padre==null){ 
+    		this.profundidad=0;
+    	}else{
+    		this.profundidad = padre.profundidad + 1 ;
+    	}
+        
+        this.costo = this.profundidad + costoHeur;
+    }
+
     
     public Nodo(){
     	
@@ -53,6 +73,8 @@ public class Nodo {
 	    	Accion accion = itrAcciones.next();
 	    	
 	    	//nuevo estado 
+	    	
+	    	//Tablero nuevoEstado = new Tablero(m1);
 	    	Tablero nuevoEstado = nodoAexp.estado.clonar();
 	    	nuevoEstado.mover(accion);
 
@@ -65,5 +87,109 @@ public class Nodo {
 	    	
     	}
     }
+    
+    
+    /** metodo que expande un nodo segun las acciones que se puedan realizar a partir de el 
+     */
+     public static void expandirNodo(Nodo nodoAexp , ArrayList<Nodo>frontera , HeuristicaInterf heur ){    
+         //listado de nodos posibles al expandir
+        ArrayList <Accion> acciones = nodoAexp.estado.accionesPosibles(null);
+        Iterator<Accion> itrAcciones = acciones.iterator();
+
+        
+        int mejorCosto = -1 ;
+        
+        ArrayList<Nodo> mejoresNodos = new ArrayList<Nodo>();
+        
+        int costoTotalNodo = 0 ;
+        
+    	while (itrAcciones.hasNext()) {
+            Accion accion = itrAcciones.next();
+            
+            Tablero nuevoEstado = nodoAexp.estado.clonar();
+            nuevoEstado.mover( accion );    
+            
+            // se obtine el costo  del posible nodo a expandir y se crea un tablero con el estado correspóndiente
+            int costoH = heur.heuristica (nuevoEstado.matriz, Problema.MATRIZ_META );
+            
+            Nodo nuevoNodo = new Nodo(nodoAexp,nuevoEstado,accion,costoH );
+            
+            costoTotalNodo = nuevoNodo.getCosto();
+            
+            if ( mejorCosto < 0 ) mejorCosto = costoTotalNodo ;
+            
+            if (costoTotalNodo <= mejorCosto ){
+		
+            	mejorCosto = costoTotalNodo ;
+            	
+            	mejoresNodos.add( nuevoNodo );
+            } 
+            
+            //System.out.println(nuevoNodo.getAccion()+" queda "+nuevoEstado.toString()+" costo "+nuevoNodo.getCosto());
+            
+    	}
+    	int tam = mejoresNodos.size();
+    	
+    	for(int i = 0 ; i <tam ; i++){
+    		if( mejoresNodos.get(i).getCosto() == mejorCosto )
+    			
+    			frontera.add(mejoresNodos.get( i ));
+    	}
+
+        System.out.println("frontera.size():" + frontera.size());
+
+    }
+
+
+	public Nodo getPadre() {
+		return padre;
+	}
+
+
+	public void setPadre(Nodo padre) {
+		this.padre = padre;
+	}
+
+
+	public Tablero getEstado() {
+		return estado;
+	}
+
+
+	public void setEstado(Tablero estado) {
+		this.estado = estado;
+	}
+
+
+	public Accion getAccion() {
+		return accion;
+	}
+
+
+	public void setAccion(Accion accion) {
+		this.accion = accion;
+	}
+
+
+	public int getProfundidad() {
+		return profundidad;
+	}
+
+
+	public void setProfundidad(int profundidad) {
+		this.profundidad = profundidad;
+	}
+
+
+	public int getCosto() {
+		return costo;
+	}
+
+
+	public void setCosto(int costo) {
+		this.costo = costo;
+	}
+     
+
     
 }
