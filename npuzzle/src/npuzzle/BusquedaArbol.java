@@ -9,9 +9,11 @@ public class BusquedaArbol {
 		 
 	/**
 	 * Metodo que realiza la busqueda por ancho
+	 * Llena un hashmap con datos extras sobre la busqueda realizada
 	 * @return un nodo objetivo  o null si se produjo un fallo
 	 * */
-	public static Nodo busquedaAncho(Tablero tablero){
+	public static Nodo busquedaAncho(Tablero tablero, 
+			HashMap <String, String> extradat){
 		
 		/*Lista de estados generados para evitar volver 
 		 * a generar estados repetidos */
@@ -31,13 +33,17 @@ public class BusquedaArbol {
 		while(true){
 				
 			if ( frontera.isEmpty() ){
+				extradat.put("CANT_ESTGEN",Integer.toString(mapaEstadosgen.size()));
 				return null ;
 			}
 				
 			//obtiene y remueve el primero
 			nodo = frontera.remove(0);
 			
-			if (Problema.testObjetivo(nodo.estado.matriz)){							
+			if (Problema.testObjetivo(nodo.estado.matriz)){
+				
+				extradat.put("CANT_ESTGEN",Integer.toString(mapaEstadosgen.size()));
+				
 				return nodo ;
 			}
 			
@@ -86,7 +92,8 @@ public class BusquedaArbol {
 	}
 	
 	
-	public static Nodo busquedaAmas(Tablero tablero, HeuristicaInterf heur ){
+	public static Nodo busquedaAmas(Tablero tablero, HeuristicaInterf heur, 
+			HashMap <String, String> extradat){
 		
 		
 		/*Lista de estados generados para evitar volver 
@@ -96,7 +103,7 @@ public class BusquedaArbol {
 		
 		//Nodo inicial 
 		
-		int costoH = Problema.heurManhattan(tablero.matriz,Problema.MATRIZ_META);
+		int costoH = heur.heuristica(tablero.matriz,Problema.MATRIZ_META);
 		
 		Nodo nodoinicial = new Nodo(null,tablero, null, costoH) ;
 		
@@ -112,6 +119,7 @@ public class BusquedaArbol {
 				
 			if ( frontera.isEmpty() ){
 				System.out.println("mapaEstadosgen.size():" + mapaEstadosgen.size());
+				extradat.put("CANT_ESTGEN",Integer.toString(mapaEstadosgen.size()));
 				return null ;
 			}
 				
@@ -120,7 +128,8 @@ public class BusquedaArbol {
 			
 			
 			
-			if (Problema.testObjetivo(nodo.estado.matriz)){							
+			if (Problema.testObjetivo(nodo.estado.matriz)){
+				extradat.put("CANT_ESTGEN",Integer.toString(mapaEstadosgen.size()));
 				return nodo ;
 			}
 			

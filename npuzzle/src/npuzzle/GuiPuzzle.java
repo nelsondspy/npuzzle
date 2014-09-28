@@ -6,19 +6,17 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneLayout;
@@ -43,8 +41,12 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
     
     //Es el tablero inicial con el problema a resolver
     Tablero tableroProblema;
-    
+    //Nodo resultado de la busqueda
     Nodo nodoResultado;
+    //datos complementarios de la busqueda
+    HashMap <String, String> extradat = new HashMap <String, String>();
+    //Tipos de busqueda  manhattan
+    private enum TipoBusqueda {ANCHO, A_HMANHAT, A_PIEZFD };
     
     public GuiPuzzle(){//constructor de la clase        
  
@@ -177,7 +179,7 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
             tableroProblema = new Tablero(Problema.MATRIZ_META);
             
             //desordena el tablero aletaroriamente
-            Problema.desordenar(tableroProblema , 10 );
+            Problema.desordenar(tableroProblema , 2);
             
             //hallar la cantidad de inversiones 
             int inversiones = Problema.cantInversiones(tableroProblema.matriz);
@@ -195,86 +197,63 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
             //completar(puzz, panelpuzz);
         }
     	if (e.getSource()==bEjecutar){
-    		//Busqueda Ancho
-    		if (rdBa.isSelected()){
-    			long time_start, time_end;
+    		
+    		//Establece el tipo de busqueda seleccionado
+    		TipoBusqueda tipobusq = TipoBusqueda.ANCHO;
+    		if (rdBa.isSelected()) tipobusq = TipoBusqueda.ANCHO ;
+    		if (rdA.isSelected() && rdHu1.isSelected()) tipobusq =TipoBusqueda.A_HMANHAT ;
+    		if (rdA.isSelected() && rdHu2.isSelected())tipobusq = TipoBusqueda.A_PIEZFD ;
+    		
+    		long time_start = 0 , time_end =0;
+    		
+    		switch (tipobusq) {
+    		
+			case ANCHO :
     			time_start = System.currentTimeMillis();
-    			/*
-    			llamar al metodo de busqueda
-    			*/
-    			//jep.setText("<bold>Problema:</bold>" + tablaHTML(puzz) );
-    			
-    			nodoResultado = BusquedaArbol.busquedaAncho(tableroProblema);
-    			if (nodoResultado == null){
-    				JOptionPane.showMessageDialog(null,"fallo al resolver!.");
-    			}else{
-    				jep.setText("<p>Probl:</p>"+tablaHTML(puzz)+
-    					"<p>Sol:</p>"+tablaHTML(nodoResultado.estado.matriz));
-    			}
-    			
+    			/*Llama al metodo de busqueda A-Ancho*/	
+    			nodoResultado = BusquedaArbol.busquedaAncho(tableroProblema, extradat);
     			time_end = System.currentTimeMillis();
-    			System.out.println("El algoritmo Busqueda en Ancho tardo "+ ( time_end - time_start ) +" milisegundos ");
-    			//Integer [][] puz = {{0, 1, 2},{3, 4, 5},{6, 7, 8}};
-    			panelres.removeAll();
-    			//completar(puz, panelres);
-    			tiempo.setText(""+(time_end - time_start));
-    		}
-    		//Busqueda A*
-    		if (rdA.isSelected()){
-    			if (rdHu1.isSelected()){
-    				long time_start, time_end;
-        			time_start = System.currentTimeMillis();
-        			
-        			
-        			/*Llamar al metodo de busqueda*/
-        			HeurManhattan heurMan = new HeurManhattan();
-        			nodoResultado = BusquedaArbol.busquedaAmas(tableroProblema, heurMan );
-        			
-        			if (nodoResultado == null){
-        			
-        				JOptionPane.showMessageDialog(null,"fallo al resolver!.");
-        			
-        			}else{
-        			
-        				jep.setText("<p>Probl:</p>"+tablaHTML(puzz)+
-        					"<p>Sol:</p>"+tablaHTML(nodoResultado.estado.matriz));
-        			}
-        			
-        			time_end = System.currentTimeMillis();
-        			System.out.println("El algoritmo Busqueda A* con H1 tardo "+ ( time_end - time_start ) +" milisegundos ");
-        			//Integer [][] puz = {{0, 1, 2},{3, 4, 5},{6, 7, 8}};
-        			panelres.removeAll();
-        			//completar(puz, panelres);
-        			tiempo.setText(""+(time_end - time_start));
-    			} else if (rdHu2.isSelected()){
-    				long time_start, time_end;
-        			time_start = System.currentTimeMillis();
-        			/*
-        			llamar al metodo de busqueda
-        			*/
-        			/*Llamar al metodo de busqueda*/
-        			HeurFueradLug heurPFL = new HeurFueradLug();
-        			nodoResultado = BusquedaArbol.busquedaAmas(tableroProblema, heurPFL );
-        			
-        			if (nodoResultado == null){
-        			
-        				JOptionPane.showMessageDialog(null,"fallo al resolver!.");
-        			
-        			}else{
-        			
-        				jep.setText("<p>Probl:</p>"+tablaHTML(puzz)+
-        					"<p>Sol:</p>"+tablaHTML(nodoResultado.estado.matriz));
-        			}
-        			
-        			time_end = System.currentTimeMillis();
-        			System.out.println("El algoritmo Busqueda A* con H1 tardo "+ ( time_end - time_start ) +" milisegundos ");
-        			//Integer [][] puz = {{0, 1, 2},{3, 4, 5},{6, 7, 8}};
-        			panelres.removeAll();
-        			//completar(puz, panelres);
-        			tiempo.setText(""+(time_end - time_start));
-    			}
-    			
-    		}
+				break;
+				
+			case A_HMANHAT:				
+    			time_start = System.currentTimeMillis();
+    			/*Llamar al metodo de busqueda*/
+    			HeurManhattan heurMan = new HeurManhattan();
+    			nodoResultado = BusquedaArbol.busquedaAmas(tableroProblema, heurMan , extradat );
+    			time_end = System.currentTimeMillis();
+    		
+				break;
+				
+			case A_PIEZFD:	
+    			time_start = System.currentTimeMillis();
+    			/*Llamar al metodo de busqueda*/
+    			HeurFueradLug heurPFL = new HeurFueradLug();
+    			nodoResultado = BusquedaArbol.busquedaAmas(tableroProblema, heurPFL, extradat);
+    			time_end = System.currentTimeMillis();
+				break;
+			
+			default:
+				break;
+			}
+    		
+    		//verifica el resultado
+    		if (nodoResultado == null){
+				JOptionPane.showMessageDialog(null,"fallo al resolver!.");
+			}else{
+				jep.setText("<p>Probl:</p>"+tablaHTML(puzz)+
+					"<p>Sol:</p>"+tablaHTML(nodoResultado.estado.matriz));
+			}
+			
+			panelres.removeAll();
+			tiempo.setText(""+(time_end - time_start)); //completa el tiempo
+			//cantidad de nodos
+			String cantnodos = extradat.get("CANT_ESTGEN");
+			if (cantnodos != null) nodos.setText(cantnodos);
+			
+			System.out.println("El algoritmo Busqueda "+ tipobusq + "tardo "+ 
+					( time_end - time_start ) +" milisegundos ");
+				
+	    		
     	}
     }
     
