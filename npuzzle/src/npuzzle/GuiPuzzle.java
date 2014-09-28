@@ -176,10 +176,14 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
             Problema.MATRIZ_META = Problema.generarMeta( n );
             
             //Instancia el tablero con la matriz meta
-            tableroProblema = new Tablero(Problema.MATRIZ_META);
+            int[][] estadoIni = new int [n][n];
+            
+            MatrizUtils.copiarMatrices(Problema.MATRIZ_META, estadoIni);
+            
+            tableroProblema = new Tablero(estadoIni);
             
             //desordena el tablero aletaroriamente
-            Problema.desordenar(tableroProblema , 2);
+            Problema.desordenar(tableroProblema , 200);
             
             //hallar la cantidad de inversiones 
             int inversiones = Problema.cantInversiones(tableroProblema.matriz);

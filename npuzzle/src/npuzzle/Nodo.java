@@ -9,9 +9,8 @@ public class Nodo {
     Tablero estado;
     Accion accion;
     int profundidad = 0;
-    
     int costo = 0 ;
-    
+    int heuristica=0 ;
     
     public Nodo(Tablero estado, Nodo padre, Accion accion){
     	this.estado = estado;
@@ -32,7 +31,7 @@ public class Nodo {
         this.padre = padre;
         this.estado = estado;
         this.accion = accion;
-        
+        this.heuristica = costoHeur;
         
         if (padre==null){ 
     		this.profundidad=0;
@@ -44,9 +43,7 @@ public class Nodo {
     }
 
     
-    public Nodo(){
-    	
-    }
+   
     
     
     /**
@@ -131,7 +128,7 @@ public class Nodo {
     	int tam = mejoresNodos.size();
     	
     	for(int i = 0 ; i <tam ; i++){
-    		if( mejoresNodos.get(i).getCosto() == mejorCosto )
+    		if( mejoresNodos.get(i).getCosto() <= mejorCosto )
     			
     			frontera.add(mejoresNodos.get( i ));
     	}
