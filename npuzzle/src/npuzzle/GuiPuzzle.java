@@ -166,9 +166,17 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
     public void actionPerformed(ActionEvent e) {//sobreescribimos el metodo del listener
     	int n;
     	if(e.getSource()==bCrear){//podemos comparar por el contenido del boton   		
-            //Los campos de texto son de tipo string, asi que tomamos la cadena con el metodo .getText()
-            //y lo almacenamos en la variable.
-            n = Integer.parseInt(tn.getText());
+            
+    		
+    		//Valida que ingrese N
+    		if ((tn.getText().length()) == 0){ 
+    			JOptionPane.showMessageDialog( null, "Ingrese N:" );
+    			tn.requestFocus();
+    			return ;
+    		};
+    		
+    		n = Integer.parseInt(tn.getText());
+            
             //crear puzzle
             panelpuzz.removeAll();
             
@@ -178,18 +186,20 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
             //Instancia el tablero con la matriz meta
             int[][] estadoIni = new int [n][n];
             
+            //int[][] estadoIni = {{2,4,3},{1,0,5},{7,8,6}};
+            
             MatrizUtils.copiarMatrices(Problema.MATRIZ_META, estadoIni);
             
             tableroProblema = new Tablero(estadoIni);
             
             //desordena el tablero aletaroriamente
-            Problema.desordenar(tableroProblema , 200);
+            Problema.desordenar(tableroProblema, 100 );
             
             //hallar la cantidad de inversiones 
             int inversiones = Problema.cantInversiones(tableroProblema.matriz);
             
             if (inversiones % 2 != 0){
-            	System.out.println("NO ES RESOLUBLE!");
+            	
             	JOptionPane.showMessageDialog(null,"NO ES RESOLUBLE!.");
             }
             
@@ -198,7 +208,6 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
             jep.setContentType("text/html");
             jep.setText("<bold>Problema:</bold>" + tablaHTML(puzz) );
             
-            //completar(puzz, panelpuzz);
         }
     	if (e.getSource()==bEjecutar){
     		
@@ -261,30 +270,6 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
     	}
     }
     
-    private void completar(int[][] puzz, JPanel panel)
-	{
-    	int filas = puzz.length;
-		int columnas = puzz[0].length;
-		Font fuente=new Font("Dialog", Font.BOLD, 15);
-		//frame.getContentPane().setLayout(new GridLayout(filas,columnas));
-		panel.setLayout(new GridLayout(filas,columnas));
-		JTextField [][] textField = new JTextField [filas][columnas];
-		for (int i = 0; i < filas; i++) {
-			for (int j = 0; j < columnas; j++) {
-				textField[i][j] = new JTextField(2);		
-				if (puzz[i][j]==0) {
-					textField[i][j].setBackground(Color.BLACK);
-				} else {
-					textField[i][j].setText(Integer.toString(puzz[i][j]));
-					textField[i][j].setFont(fuente);
-					textField[i][j].setHorizontalAlignment(JTextField.CENTER); 
-				}	
-				textField[i][j].setEditable(false);
-				panel.add(textField[i][j]);
-			}
-		}
-		frame.setVisible(true);
-	}
     
     public static String tablaHTML(int[][] matriz){
     	  String strsalida="<table fontsize=\"10\" border=\"1\">" ;

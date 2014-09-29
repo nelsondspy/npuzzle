@@ -7,11 +7,14 @@ import java.util.HashMap;
 
 public class BusquedaArbol {
 		 
-	/**
-	 * Metodo que realiza la busqueda por ancho
-	 * Llena un hashmap con datos extras sobre la busqueda realizada
-	 * @return un nodo objetivo  o null si se produjo un fallo
-	 * */
+	
+   /**
+     * Realiza la busqueda por ancho , generando todos los estados posibles
+     * evitando repetirlos.
+     * @param tablero con el estado inicial
+     * @param @return datos extra de la busqueda realizada, estadisticas
+     * */
+
 	public static Nodo busquedaAncho(Tablero tablero, 
 			HashMap <String, String> extradat){
 		
@@ -62,36 +65,12 @@ public class BusquedaArbol {
 	}
 	
 	
-	public static void main(String[] args) {
-		
-		//Genera una matriz con los datos del estado meta
-		Problema.MATRIZ_META = Problema.generarMeta( 3 );
-				
-				
-		BusquedaArbol busqueda = new BusquedaArbol();
-		
-		Tablero tablero = new Tablero(3,true);
-				
-		//Nodo resultado = busqueda.busquedaAncho( tablero );
-		//Nodo resultado = busqueda.busquedaAmas( tablero );
-		//si el resultado es null entonces fallo la busqueda
-		/*if (resultado != null){	
-			
-			System.out.println(resultado.estado.toString());
-			
-			System.out.println(Problema.accionesSolucion(resultado).toString());
-			
-			System.out.println(tablero.toString());
-			
-			
-		}
-		else{
-			System.out.println("Fallo la busqueda");
-		}
-		*/
-	}
-	
-	
+    /**
+     * Busqueda en profundidad con informacion A*
+     * @param tablero con el estado inicial
+     * @param funcion heuristica a aplicar
+     * @param @return datos extra de la busqueda realizada, estadisticas
+     * */
 	public static Nodo busquedaAmas(Tablero tablero, HeuristicaInterf heur, 
 			HashMap <String, String> extradat){
 		
@@ -118,7 +97,6 @@ public class BusquedaArbol {
 		while(true){
 				
 			if ( frontera.isEmpty() ){
-				System.out.println("mapaEstadosgen.size():" + mapaEstadosgen.size());
 				extradat.put("CANT_ESTGEN",Integer.toString(mapaEstadosgen.size()));
 				return null ;
 			}
@@ -126,28 +104,14 @@ public class BusquedaArbol {
 			//obtiene y remueve el ultimo insertado,comportamiento de pila 
 			nodo = frontera.remove( frontera.size() - 1 );
 			
-			
-			
 			if (Problema.testObjetivo(nodo.estado.matriz)){
 				extradat.put("CANT_ESTGEN",Integer.toString(mapaEstadosgen.size()));
 				return nodo ;
 			}
 			
-			//Hash del estado, osea la matriz
-	    	String hashmatriz = nodo.estado.toStrHash();
-	    	
-			if ( ! mapaEstadosgen.containsKey( hashmatriz )){
-				
-				System.out.println(nodo.estado.toString());
-				System.out.println("  getCosto()" +nodo.getCosto() );
-				System.out.println("...............................");
-				   
-				//inserta en la lista de hash de estados
-			    mapaEstadosgen.put(hashmatriz, hashmatriz);
-			
-			    //expande y los nuevos nodos los inserta directamente en la frontera
-				Nodo.expandirNodo(nodo, frontera,  heur);
-	    	}					
+			//expande y los nuevos nodos los inserta directamente en la frontera
+			Nodo.expandirNodo(nodo, frontera,  heur, mapaEstadosgen);
+	    						
 		}
 	}
 }

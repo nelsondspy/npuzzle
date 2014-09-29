@@ -1,5 +1,6 @@
 package npuzzle;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import npuzzle.Problema.Accion;
@@ -34,12 +35,19 @@ public class Nodo {
         this.heuristica = costoHeur;
         
         if (padre==null){ 
-    		this.profundidad=0;
-    	}else{
+    		
+        	this.profundidad=0;
+    		
+    	
+        }else{
+        	
     		this.profundidad = padre.profundidad + 1 ;
+    		
     	}
         
         this.costo = this.profundidad + costoHeur;
+        
+        
     }
 
     
@@ -88,7 +96,8 @@ public class Nodo {
     
     /** metodo que expande un nodo segun las acciones que se puedan realizar a partir de el 
      */
-     public static void expandirNodo(Nodo nodoAexp , ArrayList<Nodo>frontera , HeuristicaInterf heur ){    
+     public static void expandirNodo(Nodo nodoAexp , ArrayList<Nodo>frontera ,
+    		 HeuristicaInterf heur, HashMap <String, String> mapaEstadosgen ){    
          //listado de nodos posibles al expandir
         ArrayList <Accion> acciones = nodoAexp.estado.accionesPosibles(null);
         Iterator<Accion> itrAcciones = acciones.iterator();
@@ -105,6 +114,16 @@ public class Nodo {
             
             Tablero nuevoEstado = nodoAexp.estado.clonar();
             nuevoEstado.mover( accion );    
+            
+            //control para evitar evaluar heuristicas para estados ya generados
+            String hashmatriz = nuevoEstado.toStrHash();
+            
+            if (  mapaEstadosgen.containsKey( hashmatriz )){
+            	continue ;
+            }
+            
+            mapaEstadosgen.put(hashmatriz, hashmatriz);
+            
             
             // se obtine el costo  del posible nodo a expandir y se crea un tablero con el estado correspóndiente
             int costoH = heur.heuristica (nuevoEstado.matriz, Problema.MATRIZ_META );
