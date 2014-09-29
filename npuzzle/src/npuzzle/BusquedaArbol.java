@@ -109,8 +109,11 @@ public class BusquedaArbol {
 				return nodo ;
 			}
 			
+			System.out.println("frontera:" + frontera.size());
+			
 			//expande y los nuevos nodos los inserta directamente en la frontera
 			Nodo.expandirNodo(nodo, frontera,  heur, mapaEstadosgen);
+			
 	    						
 		}
 	}

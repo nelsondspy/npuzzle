@@ -153,9 +153,7 @@ public class Tablero {
     	return nuevoTablero ;
     }
     
-    public int toIntHash(){
-    	return MatrizUtils.hash(matriz);
-    }
+    
 
     public String toStrHash(){
     	return MatrizUtils.strElementos(matriz);

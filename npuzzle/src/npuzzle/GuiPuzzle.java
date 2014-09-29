@@ -1,13 +1,17 @@
 package npuzzle;
 
 
-import java.awt.Color;
+
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.ButtonGroup;
@@ -23,9 +27,11 @@ import javax.swing.ScrollPaneLayout;
 import javax.swing.JEditorPane;
 import javax.swing.JOptionPane; // 
 
+import npuzzle.Problema.Accion;
+
 public class GuiPuzzle implements ActionListener{//implementando el listener de eventos
  
-    JButton bCrear, bEjecutar;//creando variables globales de los botones
+    JButton bCrear, bEjecutar, bReporte ;//creando variables globales de los botones
     JLabel ln, lmetodo, lheuristica, lv, lnodos, ltiempo;//creando variables globales para las etiquetas
     JTextField tn, nodos, tiempo;//creando variables globales para los campos de texto
     JFrame frame;//creacion de ventana con el titulo
@@ -70,12 +76,14 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
         
         //Instanciando cuadros de texto
         tn = new JTextField(3);
+        tn.setText("3");
         nodos = new JTextField(10);
         tiempo = new JTextField(10);
         
         //Instanciando boton con texto
         bCrear = new JButton("Generar Puzzle");
-        bEjecutar = new JButton("Ejecutar");
+        bEjecutar = new JButton("Buscar solucion");
+        bReporte = new JButton("reporte");
         
         paneln  = new JPanel();
         panelba  = new JPanel();
@@ -97,6 +105,7 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
         
         rdA = new JRadioButton("Búsqueda A*");
         grAlg.add(rdA);
+        rdBa.setSelected(true);
         
         rdHu1 = new JRadioButton("Distancia de Manhattan");
         grHu.add(rdHu1);
@@ -123,9 +132,10 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
         panelppal.add(panelhu);
         
         panelbot.setLayout(new FlowLayout());
-        panelbot.setPreferredSize(new Dimension(200,80));
+        panelbot.setPreferredSize(new Dimension(200,100));
         panelbot.add(bCrear);
         panelbot.add(bEjecutar);
+        panelbot.add(bReporte);
         
         panelnum.setLayout(new GridLayout(4,0));
         panelnum.add(lnodos);
@@ -146,6 +156,7 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
         //añadiendo el listener a los botones para manipular los eventos del click
         bCrear.addActionListener(this);        
         bEjecutar.addActionListener(this);
+        bReporte.addActionListener(this);
         
         frame.add(scrPane);
         scrPane.setLayout(new ScrollPaneLayout());
@@ -165,6 +176,8 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
     @Override
     public void actionPerformed(ActionEvent e) {//sobreescribimos el metodo del listener
     	int n;
+    	TipoBusqueda tipobusq = TipoBusqueda.ANCHO;
+    	
     	if(e.getSource()==bCrear){//podemos comparar por el contenido del boton   		
             
     		
@@ -193,7 +206,7 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
             tableroProblema = new Tablero(estadoIni);
             
             //desordena el tablero aletaroriamente
-            Problema.desordenar(tableroProblema, 100 );
+            Problema.desordenar(tableroProblema, 50 );
             
             //hallar la cantidad de inversiones 
             int inversiones = Problema.cantInversiones(tableroProblema.matriz);
@@ -211,8 +224,14 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
         }
     	if (e.getSource()==bEjecutar){
     		
+    		//valida que haya generado el problema
+    		if(tableroProblema==null){
+    			JOptionPane.showMessageDialog( null, "Genere el tablero problema antes de buscar" );
+    			return ;
+    		} 
+    		
     		//Establece el tipo de busqueda seleccionado
-    		TipoBusqueda tipobusq = TipoBusqueda.ANCHO;
+    		
     		if (rdBa.isSelected()) tipobusq = TipoBusqueda.ANCHO ;
     		if (rdA.isSelected() && rdHu1.isSelected()) tipobusq =TipoBusqueda.A_HMANHAT ;
     		if (rdA.isSelected() && rdHu2.isSelected())tipobusq = TipoBusqueda.A_PIEZFD ;
@@ -255,6 +274,8 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
 			}else{
 				jep.setText("<p>Probl:</p>"+tablaHTML(puzz)+
 					"<p>Sol:</p>"+tablaHTML(nodoResultado.estado.matriz));
+				
+				
 			}
 			
 			panelres.removeAll();
@@ -264,9 +285,13 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
 			if (cantnodos != null) nodos.setText(cantnodos);
 			
 			System.out.println("El algoritmo Busqueda "+ tipobusq + "tardo "+ 
-					( time_end - time_start ) +" milisegundos ");
-				
-	    		
+					( time_end - time_start ) +" milisegundos ");		
+    	}
+    	
+    	//genera y abre el reporte
+    	if (e.getSource()==bReporte){
+    		if (nodoResultado != null) reporteSolucion(tipobusq);
+    		
     	}
     }
     
@@ -288,9 +313,71 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
                
                strsalida += "</tr>";
                strsalida +="\n";
-               
           }
           strsalida +="</table>" ;
           return strsalida;
+          
+    }
+    
+    /*Metodo que muestra un reporte html con la lista de acciones a seguir*/
+    private void reporteSolucion(TipoBusqueda tipobusq ){
+    	//salida a achivo
+    	PrintWriter out = null ;
+    	
+    	try {
+			out = new PrintWriter("resultado_busq.html");
+		}
+    	catch (Exception e) {
+		
+    		e.printStackTrace();
+    	}
+    	
+    	//this.nodoSolucion
+    	ArrayList<Accion> listaac = Problema.accionesSolucion(nodoResultado);
+    	
+    	int size = listaac.size()- 1;
+    	
+    	String salida ="<p style=\"{color:red;}\">Problema:" +
+    			tablaHTML(tableroProblema.matriz)  + "</p>";
+
+    	salida += "<p style=\"{color:green;}\"> Tipo de busqueda: " + tipobusq + "</p>";
+    	salida += "<p>ACCIONES A APLICAR= " + size  + " acciones :</p>";
+    	
+    	Tablero tableroresul = tableroProblema.clonar();
+    	
+    	out.println(salida);
+    	salida="";
+    	int c = 0 ;
+    	for(int i=size ; i>=0 ; i--){
+    		
+    		Accion accionaplicar = listaac.get(i);
+    		tableroresul.mover(accionaplicar);
+    		
+    		salida += "<div style=\"{ float:left; margin-left:20px; "
+    				+ "border: 1px solid;border-color:grey;}\"><p>" + 
+    				accionaplicar + tablaHTML(tableroresul.matriz) +  "</p></div>";
+    		
+    		c++;
+    		
+    		if (c==20){
+    			out.println(salida);
+    			salida="";
+    			c = 0;
+    		}
+    	}
+    	
+    	out.println(salida);
+    		
+		File file = new File ("resultado_busq.html");
+		Desktop desktop = Desktop.getDesktop();
+		try {
+			desktop.open(file);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			
+		
+    	
     }
 }

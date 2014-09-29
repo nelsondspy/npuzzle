@@ -74,7 +74,7 @@ public class MatrizUtils {
       }
     
     /**
-     * Funcion que copia dos matrices del mismo tamanho
+     * Funcion que copia dos matrices cuadradas de la misma dimension
      * 
      * */
 	public static void copiarMatrices(int [][] matriz1, int [][] matriz2){
@@ -87,6 +87,10 @@ public class MatrizUtils {
 
 	  }
 	
+	/**
+	 * @param matriz cuadrada de tipo entero
+	 * @return cadena con elementos de matriz separadas por.
+	 * */
 	public static String strElementos(int [][] matriz){
 		String str="";
 	    for(int f=0; f< matriz.length; f++ ){
@@ -97,21 +101,6 @@ public class MatrizUtils {
 	    return str;
 
 	  }
-	
-	public static int hash(int [][] matriz){
-		int h=7;
-		
-	    for(int f=0; f< matriz.length; f++ ){
-	    	 
-	         for(int c=0; c < matriz.length; c++ ){
-	        	 h = h +((matriz[f][c] * f * 91) +  (matriz[f][c]* c *11)) + matriz[f][c] ;
-	        
-	        }
-	    }
-	    return h;
-
-	  }
-
 }
 
 

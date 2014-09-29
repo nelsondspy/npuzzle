@@ -110,6 +110,7 @@ public class Nodo {
         int costoTotalNodo = 0 ;
         
     	while (itrAcciones.hasNext()) {
+    		
             Accion accion = itrAcciones.next();
             
             Tablero nuevoEstado = nodoAexp.estado.clonar();
@@ -151,9 +152,6 @@ public class Nodo {
     			
     			frontera.add(mejoresNodos.get( i ));
     	}
-
-        System.out.println("frontera.size():" + frontera.size());
-
     }
 
 

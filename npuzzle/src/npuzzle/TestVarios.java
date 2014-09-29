@@ -1,7 +1,9 @@
 package npuzzle;
 import java.util.Iterator;
 import java.util.ArrayList;
+
 import npuzzle.Problema.Accion;
+
 import java.util.Arrays;
 
 
@@ -10,7 +12,21 @@ public class TestVarios {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Tablero t = new Tablero(3,true);
+		int[][]matriz = new int [5][5];
+		System.out.println("length:" + matriz.length);
+		
+		/*int m2 [][] = {
+	    		{5,	6	,2},
+	    		{8	,0	,7},
+	    		{3	,1	,4 }
+	    		};
+		*/
+		int m1 [][] = {
+	    		{1,	0	,2},
+	    		{4	,3	,5},
+	    		{6	,7	,8 }
+	    		};
+		Tablero t = new Tablero(m1);
 		
 		ArrayList <Accion> movimienPosib = t.accionesPosibles(null);
 	    Iterator<Accion> itr = movimienPosib.iterator();
@@ -19,33 +35,23 @@ public class TestVarios {
 	    while (itr.hasNext()) {
 	    	Accion mov = itr.next();
 	        
+	    	System.out.println("===============================");
 	        System.out.println("despues de mover " + mov.toString() );
-	        t.mover(mov);
-	        //prueba de test objetivo
-	        System.out.println("T.O:" + Problema.testObjetivo(t.matriz));
 	        
-	        System.out.println(t.toString());
+	        //Tablero nuevot = new Tablero(t.matriz);
+	        Tablero nuevot = t.clonar();
+	        
+	        nuevot.mover(mov);
+	        //prueba de test objetivo
+	        System.out.println("T.O:" + Problema.testObjetivo(nuevot.matriz));
+	        
+	        System.out.println(nuevot.toString());
 	        System.out.println("-----");
 	      }
 	    
-	    //test objetivo 1. debe dar true 
-	    int estadoob[][] ={{0,1,2},{3,4,5},{6,7,8}};
-	    System.out.println("T.O:" + Problema.testObjetivo(estadoob));
 	    
-	    //test objetivo 2 debe dar true 
-	    int estadoob2[][] ={{1,2,3},{4,5,6},{7,8,0}};
-	    System.out.println("T.O:" + Problema.testObjetivo(estadoob2));
 	    
-	    int estadoob3[][] ={{0,1,2},{3,4,5},{6,7,8}};
 	    
-	    /*7	 5	8
-		  0	 1	2
-		  3	 4	6
-	    */
-	    
-	    System.out.println("hash1:" + Arrays.hashCode(estadoob[1]));
-	    System.out.println("hash2:" + Arrays.hashCode(estadoob2));
-	    System.out.println("hash3:" + Arrays.hashCode(estadoob3[1]));
 	    
 	}
 }
