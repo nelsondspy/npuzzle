@@ -32,8 +32,8 @@ import npuzzle.Problema.Accion;
 public class GuiPuzzle implements ActionListener{//implementando el listener de eventos
  
     JButton bCrear, bEjecutar, bReporte ;//creando variables globales de los botones
-    JLabel ln, lmetodo, lheuristica, lv, lnodos, ltiempo;//creando variables globales para las etiquetas
-    JTextField tn, nodos, tiempo;//creando variables globales para los campos de texto
+    JLabel ln, lmetodo, lheuristica, lv, lnodos, ltiempo, lacciones;//creando variables globales para las etiquetas
+    JTextField tn, nodos, tiempo , cantAcciones ;//creando variables globales para los campos de texto
     JFrame frame;//creacion de ventana con el titulo
     JPanel paneln, panelba, panelhu, panelppal, panelbot, panelpuzz, panelres, panelnum;
     JRadioButton rdBa, rdA, rdHu1, rdHu2;
@@ -73,12 +73,14 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
         lv = new JLabel("");
         lnodos = new JLabel("Nodos:");
         ltiempo = new JLabel("Tiempo(ms):");
+        lacciones =  new JLabel("Cant.acciones :");
         
         //Instanciando cuadros de texto
         tn = new JTextField(3);
         tn.setText("3");
         nodos = new JTextField(10);
         tiempo = new JTextField(10);
+        cantAcciones = new JTextField(10);
         
         //Instanciando boton con texto
         bCrear = new JButton("Generar Puzzle");
@@ -142,6 +144,8 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
         panelnum.add(nodos);
         panelnum.add(ltiempo);
         panelnum.add(tiempo);
+        panelnum.add(lacciones);
+        panelnum.add(cantAcciones);
         
         //añadiendo objetos a la ventana
         frame.add(paneln);
@@ -213,7 +217,7 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
             
             if (inversiones % 2 != 0){
             	
-            	JOptionPane.showMessageDialog(null,"NO ES RESOLUBLE!.");
+            	//JOptionPane.showMessageDialog(null,"NO ES RESOLUBLE!.");
             }
             
             puzz  = tableroProblema.matriz;
@@ -271,6 +275,7 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
     		//verifica el resultado
     		if (nodoResultado == null){
 				JOptionPane.showMessageDialog(null,"fallo al resolver!.");
+				return ;
 			}else{
 				jep.setText("<p>Probl:</p>"+tablaHTML(puzz)+
 					"<p>Sol:</p>"+tablaHTML(nodoResultado.estado.matriz));
@@ -286,6 +291,8 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
 			
 			System.out.println("El algoritmo Busqueda "+ tipobusq + "tardo "+ 
 					( time_end - time_start ) +" milisegundos ");		
+			
+			cantAcciones.setText(Integer.toString(nodoResultado.getProfundidad()-1));
     	}
     	
     	//genera y abre el reporte
@@ -367,7 +374,7 @@ public class GuiPuzzle implements ActionListener{//implementando el listener de 
     	}
     	
     	out.println(salida);
-    		
+    	out.close();	
 		File file = new File ("resultado_busq.html");
 		Desktop desktop = Desktop.getDesktop();
 		try {
